@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artful — 藝術作品集</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f3ef;
+            --bg-dark: #1a1816;
+            --text: #1a1816;
+            --text-light: #f5f3ef;
+            --text-muted: #7a7672;
+            --accent: #b8a898;
+            --accent-dark: #8c7b6a;
+            --wine: #722f37;
+            --wine-light: #8b3a44;
+            --wine-muted: #a65a64;
+            --card-bg: #fffefb;
+            --border: #e5e0d8;
+            --gap: clamp(1.5rem, 4vw, 4rem);
+        }
+
+        [data-theme="dark"] {
+            --bg: #1a1816;
+            --bg-dark: #0f0e0d;
+            --text: #f5f3ef;
+            --text-light: #1a1816;
+            --text-muted: #9a9692;
+            --card-bg: #252220;
+            --border: #3a3634;
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(26, 24, 22, 0.9);
+        }
+
+        [data-theme="dark"] .hero-title::before {
+            box-shadow: 0 0 15px rgba(114, 47, 55, 0.5), 0 0 30px rgba(114, 47, 55, 0.3), 0 0 45px rgba(114, 47, 55, 0.15), inset 0 0 8px rgba(114, 47, 55, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.7;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: var(--wine);
+            color: var(--text-light);
+        }
+
+        /* Decorative Elements */
+        .decoration {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .circle {
+            border-radius: 50%;
+        }
+
+        .circle-large {
+            width: 300px;
+            height: 300px;
+            border: 1px solid var(--wine);
+            opacity: 0.1;
+        }
+
+        .circle-small {
+            width: 60px;
+            height: 60px;
+            background: var(--wine);
+            opacity: 0.08;
+        }
+
+        .circle-medium {
+            width: 120px;
+            height: 120px;
+            border: 1px solid var(--wine);
+            opacity: 0.08;
+        }
+
+        .line {
+            background: var(--wine);
+        }
+
+        .line-horizontal {
+            height: 1px;
+            width: 100px;
+        }
+
+        .line-vertical {
+            width: 1px;
+            height: 80px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--wine);
+            border-radius: 50%;
+        }
+
+        .square {
+            width: 60px;
+            height: 60px;
+            border: 1px solid var(--wine);
+            opacity: 0.2;
+            transform: rotate(45deg);
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            padding: 1rem 3rem;
+            background: var(--bg);
+            border-bottom-color: var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            color: var(--text);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+            min-width: 80px;
+        }
+
+        .nav-logo::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--wine);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+
+        .nav-logo:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            list-style: none;
+            min-width: 320px;
+            justify-content: flex-end;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0.4rem;
+            left: 1.2rem;
+            width: calc(100% - 2.4rem);
+            height: 1px;
+            background: var(--wine);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--wine);
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            transform: scaleX(1);
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 0.5rem;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            padding: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-toggle span {
+            display: block;
+            width: 24px;
+            height: 1px;
+            background: var(--text);
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+            opacity: 0.6;
+            min-width: 32px;
+        }
+
+        .theme-toggle:hover {
+            opacity: 1;
+        }
+
+        .theme-icon {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+
+        /* Hero Section - Minimalist */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 6rem 2rem;
+            background: var(--bg);
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-overline {
+            font-size: 0.65rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 300;
+            letter-spacing: 0.12em;
+            line-height: 1.2;
+            color: var(--text);
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-title::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4.2em;
+            height: 4.2em;
+            border: 1px solid transparent;
+            border-radius: 50%;
+            opacity: 0.25;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(114, 47, 55, 0.3), 0 0 20px rgba(114, 47, 55, 0.15), inset 0 0 4px rgba(114, 47, 55, 0.05);
+        }
+
+        .hero-title span {
+            display: block;
+            font-size: 0.25em;
+            letter-spacing: 0.3em;
+            margin-top: 0.8rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            color: var(--text-muted);
+        }
+
+        .hero-line {
+            width: 40px;
+            height: 1px;
+            background: var(--wine);
+            margin: 2rem auto;
+        }
+
+        .hero-description {
+            max-width: 420px;
+            margin: 0 auto;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.55rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: var(--border);
+        }
+
+        /* Section - About */
+        .section {
+            padding: 8rem var(--gap);
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+            position: relative;
+        }
+
+        .section-overline {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--wine);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        .about-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            aspect-ratio: 4/3;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .about-text {
+            padding: 2rem 0;
+        }
+
+        .about-overline {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--wine);
+            margin-bottom: 1rem;
+        }
+
+        .about-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+
+        .about-desc {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.9;
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            left: 0;
+            top: 0;
+        }
+
+        .about-signature::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 1.5rem;
+            width: 50px;
+            height: 1px;
+            background: var(--wine);
+            opacity: 0.5;
+        }
+
+        /* Decoration for about section */
+        .about-decoration {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .about-decoration-1 {
+            top: 15%;
+            left: 3%;
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--wine);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        .about-decoration-2 {
+            bottom: 20%;
+            right: 5%;
+            width: 150px;
+            height: 150px;
+            border: 1px solid var(--wine-muted);
+            opacity: 0.08;
+            transform: rotate(45deg);
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        .about-decoration-3 {
+            top: 40%;
+            right: 8%;
+            width: 8px;
+            height: 8px;
+            background: var(--wine);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.5); }
+        }
+
+        /* Gallery - Minimalist Design */
+        .gallery-section {
+            padding: 8rem var(--gap);
+            background: var(--bg);
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .gallery-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .gallery-subtitle {
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .gallery-line {
+            width: 60px;
+            height: 1px;
+            background: var(--wine);
+            margin: 1.5rem auto 0;
+        }
+
+        /* Gallery - Carousel */
+        .gallery {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .gallery-track {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .gallery-slide {
+            cursor: pointer;
+        }
+
+        .gallery-slide img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-slide:hover img {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .gallery-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .gallery-counter {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        .gallery-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .gallery-counter {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .gallery-track {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 540px) {
+            .gallery-track {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 24, 22, 0.95);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+        }
+
+        .lightbox-img-wrapper {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .lightbox-img-wrapper::before,
+        .lightbox-img-wrapper::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 1px solid var(--wine-muted);
+            pointer-events: none;
+        }
+
+        .lightbox-img-wrapper::before {
+            top: -20px;
+            left: -20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .lightbox-img-wrapper::after {
+            bottom: -20px;
+            right: -20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s ease;
+        }
+
+        .lightbox.active .lightbox-img {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: none;
+            border: 1px solid rgba(245, 243, 239, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .lightbox-close:hover {
+            border-color: var(--wine);
+            transform: rotate(90deg);
+            background: rgba(114, 47, 55, 0.3);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: none;
+            border: 1px solid rgba(245, 243, 239, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(114, 47, 55, 0.3);
+            border-color: var(--wine);
+        }
+
+        .lightbox-nav.prev { left: 2rem; }
+        .lightbox-nav.next { right: 2rem; }
+
+        .lightbox-info {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .lightbox-info-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+        }
+
+        .lightbox-info-date {
+            font-size: 0.75rem;
+            color: rgba(245, 243, 239, 0.6);
+            margin-top: 0.5rem;
+            letter-spacing: 0.15em;
+        }
+
+        /* Quote Section */
+        .quote-section {
+            background: var(--card-bg);
+            padding: 8rem var(--gap);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '"';
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20rem;
+            color: var(--wine);
+            line-height: 1;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        .quote-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to top, var(--bg), transparent);
+            pointer-events: none;
+        }
+
+        .quote-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 300;
+            font-style: italic;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            position: relative;
+            color: var(--text);
+        }
+
+        .quote-text::before,
+        .quote-text::after {
+            content: '—';
+            display: block;
+            font-size: 1rem;
+            color: var(--wine);
+            margin-bottom: 1rem;
+        }
+
+        .quote-author {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            color: var(--wine);
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            padding: 6rem var(--gap) 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            border: 1px solid var(--wine-muted);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        footer::after {
+            content: '';
+            position: absolute;
+            bottom: 50px;
+            left: 10%;
+            width: 1px;
+            height: 100px;
+            background: var(--wine);
+            opacity: 0.3;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 0 auto 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        .footer-description {
+            font-size: 0.85rem;
+            color: rgba(245, 243, 239, 0.6);
+            line-height: 1.8;
+            max-width: 300px;
+        }
+
+        .footer-title {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--wine);
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 20px;
+            height: 1px;
+            background: var(--wine);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            font-size: 0.85rem;
+            color: rgba(245, 243, 239, 0.6);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .footer-links a::before {
+            content: '→';
+            margin-right: 8px;
+            opacity: 0;
+            color: var(--wine);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: var(--wine-muted);
+            padding-left: 15px;
+        }
+
+        .footer-links a:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(245, 243, 239, 0.1);
+            font-size: 0.75rem;
+            color: rgba(245, 243, 239, 0.4);
+            letter-spacing: 0.1em;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Loading */
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            letter-spacing: 0.5em;
+            color: var(--wine);
+        }
+
+        .loader-bar {
+            width: 100px;
+            height: 1px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loader-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            background: var(--wine);
+            animation: loading 1s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(350%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .about-image-wrapper {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .about-content::before {
+                font-size: 12rem;
+                top: -40px;
+            }
+
+            .about-stats {
+                justify-content: center;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 1.5rem;
+            }
+            
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg);
+                flex-direction: column;
+                padding: 2rem;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-toggle {
+                display: flex;
+            }
+
+            .section {
+                padding: 5rem var(--gap);
+            }
+
+            .section-header {
+                margin-bottom: 3rem;
+            }
+
+            .about-grid {
+                gap: 2rem;
+            }
+
+            .about-image-wrapper {
+                max-width: 300px;
+            }
+
+            .about-image {
+                transform: rotate(0deg);
+            }
+
+            .about-image-frame,
+            .about-image-accent {
+                display: none;
+            }
+
+            .about-content {
+                padding-top: 0;
+            }
+
+            .about-content::before {
+                display: none;
+            }
+
+            .about-content-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .about-content h3 {
+                font-size: 1.4rem;
+            }
+
+            .about-text-block {
+                padding-left: 1rem;
+                border-left-width: 1px;
+            }
+
+            .about-text-block::before {
+                font-size: 2.5rem;
+                top: -10px;
+            }
+
+            .about-content p {
+                font-size: 0.9rem;
+            }
+
+            .about-stats {
+                flex-wrap: wrap;
+                gap: 1.5rem;
+                justify-content: center;
+                margin-top: 1.5rem;
+            }
+
+            .about-stat {
+                text-align: center;
+            }
+
+            .about-signature {
+                margin-top: 1.5rem;
+            }
+
+            .about-decoration-1,
+            .about-decoration-2 {
+                display: none;
+            }
+
+            .hero-stats {
+                gap: 2rem;
+            }
+
+            .stat-number {
+                font-size: 1.8rem;
+            }
+
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                max-width: 320px;
+            }
+
+            .artwork-details {
+                padding: 1rem 0;
+            }
+
+            .artwork-title {
+                font-size: 0.85rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .lightbox-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader">
+        <span class="loader-logo">Artful</span>
+        <div class="loader-bar"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="#" class="nav-logo">Artful</a>
+        <button class="nav-toggle" aria-label="選單">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="#home" class="nav-link active">首頁</a></li>
+            <li class="nav-item"><a href="#about" class="nav-link">關於</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-item"><a href="#collection" class="nav-link">作品集</a></li>
+            <li class="nav-item"><a href="#contact" class="nav-link">聯絡</a></li>
+        </ul>
+        <button class="theme-toggle" aria-label="切換主題">
+            <span class="theme-icon">&#9790;</span>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <p class="hero-overline">Artwork Collection</p>
+            <h1 class="hero-title">
+                Artful
+                <span>藝術作品集</span>
+            </h1>
+            <div class="hero-line"></div>
+            <p class="hero-description">
+                這是一個關於藝術與美的收藏。我們相信每一件作品都有其獨特的故事，
+                透過這些掃描的藝術作品，我們試圖捕捉並呈現創造力的本質。
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">29</div>
+                    <div class="stat-label">作品總數</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">收藏日期</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2026</div>
+                    <div class="stat-label">年份</div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+        <div class="about-container">
+            <div class="about-grid">
+                <div class="about-image">
+                    <img src="artwork/2026-03-20 17-56_page-0001.jpg" alt="Artwork preview">
+                </div>
+                <div class="about-text">
+                    <p class="about-overline">About</p>
+                    <h2 class="about-title">關於這個收藏</h2>
+                    <p class="about-desc">
+                        藝術是人類情感的表達，是靈魂與世界的對話。
+                        這個收藏包含了 29 件精選的藝術作品，展示了藝術的多樣性與可能性。
+                    </p>
+                    <p class="about-desc">
+                        我們希望通過這個數位展覽，讓更多人能夠欣賞並感受這些藝術作品的魅力。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section" id="collection">
+        <div class="gallery-header">
+            <p class="gallery-subtitle">Collection</p>
+            <h2 class="gallery-title">作品展示</h2>
+            <div class="gallery-line"></div>
+        </div>
+
+        <div class="gallery">
+            <div class="gallery-track" id="gallery-track"></div>
+            <div class="gallery-nav">
+                <span class="gallery-counter" id="gallery-counter">1 / 10</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quote Section -->
+    <section class="quote-section">
+        <p class="quote-text">
+            藝術並非複製我們所看到的，而是讓我們以不同的方式去看待它。
+        </p>
+        <p class="quote-author">— Henri Matisse</p>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" aria-label="關閉">&times;</button>
+        <button class="lightbox-nav prev" aria-label="上一張">&#8249;</button>
+        <button class="lightbox-nav next" aria-label="下一張">&#8250;</button>
+        <div class="lightbox-container">
+            <div class="lightbox-img-wrapper">
+                <img src="" alt="" class="lightbox-img" id="lightbox-img">
+            </div>
+        </div>
+        <div class="lightbox-info">
+            <div class="lightbox-info-title" id="lightbox-title"></div>
+            <div class="lightbox-info-date" id="lightbox-date"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-brand">Artful</div>
+                <p class="footer-description">
+                    一個關於藝術與美的數位收藏。我們致力於透過科技與設計，
+                    將藝術的美麗與感動帶給每一個人。
+                </p>
+            </div>
+            <div>
+                <h4 class="footer-title">導覽</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">首頁</a></li>
+                    <li><a href="#about">關於</a></li>
+                    <li><a href="#collection">作品集</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">作品</h4>
+                <ul class="footer-links">
+                    <li><a href="#">2026.03.20</a></li>
+                    <li><a href="#">2026.03.22</a></li>
+                    <li><a href="#">2026.03.26</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">聯絡</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Email</a></li>
+                    <li><a href="#">社群媒體</a></li>
+                    <li><a href="#">隱私政策</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Artful. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // All artworks from artwork folder
+        const artworks = [
+            { file: '2026-03-20 17-56_page-0001.jpg', date: '2026-03-20', page: 1 },
+            { file: '2026-03-20 17-56_page-0002.jpg', date: '2026-03-20', page: 2 },
+            { file: '2026-03-20 17-56_page-0003.jpg', date: '2026-03-20', page: 3 },
+            { file: '2026-03-20 17-56_page-0004.jpg', date: '2026-03-20', page: 4 },
+            { file: '2026-03-20 17-56_page-0005.jpg', date: '2026-03-20', page: 5 },
+            { file: '2026-03-20 17-56_page-0006.jpg', date: '2026-03-20', page: 6 },
+            { file: '2026-03-20 17-56_page-0007.jpg', date: '2026-03-20', page: 7 },
+            { file: '2026-03-20 17-56_page-0008.jpg', date: '2026-03-20', page: 8 },
+            { file: '2026-03-20 17-56_page-0009.jpg', date: '2026-03-20', page: 9 },
+            { file: '2026-03-20 17-56_page-0010.jpg', date: '2026-03-20', page: 10 },
+            { file: '2026-03-20 17-56_page-0011.jpg', date: '2026-03-20', page: 11 },
+            { file: '2026-03-20 17-56_page-0012.jpg', date: '2026-03-20', page: 12 },
+            { file: '2026-03-20 17-56_page-0013.jpg', date: '2026-03-20', page: 13 },
+            { file: '2026-03-20 17-56_page-0014.jpg', date: '2026-03-20', page: 14 },
+            { file: '2026-03-20 17-56_page-0015.jpg', date: '2026-03-20', page: 15 },
+            { file: '2026-03-20 17-56_page-0016.jpg', date: '2026-03-20', page: 16 },
+            { file: '2026-03-20 17-56_page-0017.jpg', date: '2026-03-20', page: 17 },
+            { file: '2026-03-20 17-56_page-0018.jpg', date: '2026-03-20', page: 18 },
+            { file: '2026-03-20 17-56_page-0019.jpg', date: '2026-03-20', page: 19 },
+            { file: '2026-03-20 17-56_page-0020.jpg', date: '2026-03-20', page: 20 },
+            { file: '2026-03-20 17-56_page-0022.jpg', date: '2026-03-20', page: 22 },
+            { file: '2026-03-20 17-56_page-0023.jpg', date: '2026-03-20', page: 23 },
+            { file: '2026-03-20 17-56_page-0024.jpg', date: '2026-03-20', page: 24 },
+            { file: '2026-03-20 17-56_page-0025.jpg', date: '2026-03-20', page: 25 },
+            { file: '2026-03-20 17-56_page-0026.jpg', date: '2026-03-20', page: 26 },
+            { file: '2026-03-20 17-56_page-0027.jpg', date: '2026-03-20', page: 27 },
+            { file: '2026-03-20 17-56_page-0028.jpg', date: '2026-03-20', page: 28 },
+            { file: '2026-03-20 17-56_page-0029.jpg', date: '2026-03-20', page: 29 },
+            { file: '2026-03-22 08-56.jpg', date: '2026-03-22', page: 'S-01' },
+            { file: '2026-03-26 23-49.jpg', date: '2026-03-26', page: 'S-02' }
+        ];
+
+        let currentIndex = 0;
+
+        // Elements
+        const galleryTrack = document.getElementById('gallery-track');
+        const galleryCounter = document.getElementById('gallery-counter');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxDate = document.getElementById('lightbox-date');
+        const loader = document.querySelector('.loader');
+        const navbar = document.querySelector('.navbar');
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
+        // Hide loader when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 800);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            const sections = document.querySelectorAll('section[id]');
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+                
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // Format date
+        function formatDate(dateStr) {
+            const [year, month, day] = dateStr.split('-');
+            return `${year}.${month}.${day}`;
+        }
+
+        // Render carousel
+        function getSlidesPerView() {
+            if (window.innerWidth <= 540) return 1;
+            if (window.innerWidth <= 900) return 2;
+            return 3;
+        }
+
+        function renderCarousel() {
+            const slidesPerView = getSlidesPerView();
+            const totalPages = Math.ceil(artworks.length / slidesPerView);
+            
+            galleryTrack.innerHTML = artworks.map((artwork, index) => `
+                <div class="gallery-slide">
+                    <img src="artwork/${artwork.file}" alt="作品 ${artwork.page}" loading="lazy">
+                </div>
+            `).join('');
+
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            const slidesPerView = getSlidesPerView();
+            const offset = (currentIndex * 100) / slidesPerView;
+            galleryTrack.style.transform = `translateX(-${offset}%)`;
+
+            const totalPages = Math.ceil(artworks.length / slidesPerView);
+            const displayPage = Math.floor(currentIndex / slidesPerView) + 1;
+            
+            galleryCounter.textContent = `${displayPage} / ${totalPages}`;
+        }
+
+        const gallery = document.querySelector('.gallery');
+
+        // Click to open lightbox
+        galleryTrack.addEventListener('click', (e) => {
+            const slide = e.target.closest('.gallery-slide');
+            if (slide) {
+                const slideIndex = Array.from(galleryTrack.children).indexOf(slide);
+                if (slideIndex !== -1) {
+                    currentIndex = slideIndex;
+                    openLightbox(currentIndex);
+                }
+            }
+        });
+
+        // Lightbox functions
+        function openLightbox(index) {
+            currentIndex = index;
+            updateLightbox();
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateLightbox() {
+            const artwork = artworks[currentIndex];
+            lightboxImg.src = `artwork/${artwork.file}`;
+            lightboxTitle.textContent = `作品 ${artwork.page}`;
+            lightboxDate.textContent = formatDate(artwork.date);
+        }
+
+        function navigate(direction) {
+            currentIndex = (currentIndex + direction + artworks.length) % artworks.length;
+            updateLightbox();
+        }
+
+        // Double click: open lightbox
+        gallery.addEventListener('dblclick', (e) => {
+            if (e.target.tagName === 'IMG') {
+                const slideIndex = Array.from(galleryTrack.children).indexOf(e.target.closest('.gallery-slide'));
+                if (slideIndex !== -1) {
+                    currentIndex = slideIndex;
+                    openLightbox(currentIndex);
+                }
+            }
+        });
+
+        // Lightbox events
+        document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+        document.querySelector('.lightbox-nav.prev').addEventListener('click', () => navigate(-1));
+        document.querySelector('.lightbox-nav.next').addEventListener('click', () => navigate(1));
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') navigate(-1);
+            if (e.key === 'ArrowRight') navigate(1);
+        });
+
+        // Initial render
+        renderCarousel();
+
+        // Theme toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const themeIcon = document.querySelector('.theme-icon');
+        
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeIcon.innerHTML = savedTheme === 'dark' ? '&#9788;' : '&#9790;';
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeIcon.innerHTML = next === 'dark' ? '&#9788;' : '&#9790;';
+        });
+    </script>
+</body>
+</html>
